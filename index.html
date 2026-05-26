@@ -3,411 +3,334 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Y2K Red Void</title>
+<title>Y2K Blue Electronics</title>
 
 <style>
-/* =========================
-   Y2K RED / BLACK WALLPAPER
-   Single-file GitHub Pages
-========================= */
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
 
-html, body {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #000;
-  font-family: Arial, Helvetica, sans-serif;
-}
+    body{
+        overflow:hidden;
+        background:
+            radial-gradient(circle at top, #163f82 0%, #07111f 35%, #02040a 100%);
+        height:100vh;
+        font-family:Verdana, sans-serif;
+    }
 
-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
+    canvas{
+        position:fixed;
+        inset:0;
+    }
 
-/* Overlay glow */
-.overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255,0,0,0.08), transparent 40%),
-    radial-gradient(circle at 20% 20%, rgba(255,60,60,0.05), transparent 25%),
-    radial-gradient(circle at 80% 70%, rgba(255,0,0,0.04), transparent 30%);
-  mix-blend-mode: screen;
-}
+    .noise{
+        position:fixed;
+        inset:0;
+        pointer-events:none;
+        opacity:.07;
+        mix-blend-mode:screen;
+        background-image:
+            repeating-radial-gradient(circle at 0 0,
+            rgba(255,255,255,.4) 0px,
+            transparent 1px,
+            transparent 4px);
+        animation:noiseMove .2s infinite linear;
+    }
 
-/* Scanlines */
-.scanlines::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255,255,255,0.02) 0px,
-      rgba(255,255,255,0.02) 1px,
-      transparent 2px,
-      transparent 4px
-    );
-  pointer-events: none;
-  mix-blend-mode: overlay;
-}
+    @keyframes noiseMove{
+        from{transform:translate(0,0)}
+        to{transform:translate(2px,-2px)}
+    }
 
-/* HUD text */
-.hud {
-  position: absolute;
-  top: 30px;
-  left: 40px;
-  color: #ff2d2d;
-  text-shadow:
-    0 0 5px #ff0000,
-    0 0 15px #ff0000,
-    0 0 30px #ff0000;
-  letter-spacing: 5px;
-  user-select: none;
-}
+    .glow{
+        position:absolute;
+        width:800px;
+        height:800px;
+        border-radius:50%;
+        background:radial-gradient(circle,
+            rgba(70,180,255,.2),
+            transparent 70%);
+        filter:blur(60px);
+        top:50%;
+        left:50%;
+        transform:translate(-50%,-50%);
+        animation:pulse 6s ease-in-out infinite;
+    }
 
-.hud h1 {
-  margin: 0;
-  font-size: clamp(32px, 5vw, 72px);
-  font-weight: 900;
-}
+    @keyframes pulse{
+        0%,100%{
+            transform:translate(-50%,-50%) scale(1);
+            opacity:.8;
+        }
+        50%{
+            transform:translate(-50%,-50%) scale(1.15);
+            opacity:1;
+        }
+    }
 
-.hud p {
-  margin-top: 10px;
-  opacity: 0.7;
-  font-size: 12px;
-}
-
-/* Chrome corner decorations */
-.corner {
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  border: 2px solid rgba(255,0,0,0.35);
-  box-shadow:
-    0 0 15px rgba(255,0,0,0.5),
-    inset 0 0 25px rgba(255,0,0,0.2);
-}
-
-.tl {
-  top: 25px;
-  left: 25px;
-  border-right: none;
-  border-bottom: none;
-}
-
-.br {
-  bottom: 25px;
-  right: 25px;
-  border-left: none;
-  border-top: none;
-}
-
-/* Floating UI circles */
-.circle {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(255,0,0,0.3);
-  box-shadow: 0 0 20px rgba(255,0,0,0.35);
-  animation: pulse 5s infinite ease-in-out;
-}
-
-.c1 {
-  width: 300px;
-  height: 300px;
-  top: 10%;
-  right: 5%;
-}
-
-.c2 {
-  width: 150px;
-  height: 150px;
-  bottom: 15%;
-  left: 10%;
-  animation-delay: -2s;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: scale(1.08);
-    opacity: 0.8;
-  }
-}
-
-.center-glow {
-  position: absolute;
-  width: 700px;
-  height: 700px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background:
-    radial-gradient(circle, rgba(255,0,0,0.15), transparent 65%);
-  filter: blur(50px);
-  pointer-events: none;
-}
-
-.instructions {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  text-align: center;
-  color: rgba(255,255,255,0.4);
-  font-size: 11px;
-  letter-spacing: 2px;
-  user-select: none;
-}
+    .title{
+        position:fixed;
+        top:30px;
+        width:100%;
+        text-align:center;
+        color:#8ed4ff;
+        letter-spacing:8px;
+        font-size:14px;
+        text-shadow:
+            0 0 5px #79d0ff,
+            0 0 15px #79d0ff,
+            0 0 30px #79d0ff;
+        opacity:.8;
+        z-index:10;
+    }
 </style>
 </head>
 
 <body>
 
-<canvas id="bg"></canvas>
+<div class="glow"></div>
+<div class="noise"></div>
+<div class="title">✦ incoming call . . . ✦</div>
 
-<div class="center-glow"></div>
-
-<div class="overlay scanlines"></div>
-
-<div class="corner tl"></div>
-<div class="corner br"></div>
-
-<div class="circle c1"></div>
-<div class="circle c2"></div>
-
-<div class="hud">
-  <h1>RED VOID_2003</h1>
-  <p>INTERACTIVE Y2K WALLPAPER</p>
-</div>
-
-<div class="instructions">
-  MOVE MOUSE • CLICK FOR GLITCH BURST
-</div>
+<canvas id="scene"></canvas>
 
 <script>
-const canvas = document.getElementById("bg");
+const canvas = document.getElementById("scene");
 const ctx = canvas.getContext("2d");
 
 let w, h;
-let particles = [];
-let mouse = { x: 0, y: 0 };
 
-function resize() {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
+function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
 }
-window.addEventListener("resize", resize);
 resize();
+window.addEventListener("resize", resize);
 
-/* =========================
-   GRID
-========================= */
+const particles = [];
+const sparkCount = 130;
 
-function drawGrid(time) {
-  const spacing = 40;
-
-  ctx.save();
-
-  ctx.translate(w / 2, h / 2);
-
-  for (let y = -h; y < h; y += spacing) {
-    const perspective = (y + h) / (2 * h);
-
-    ctx.beginPath();
-    ctx.strokeStyle = `rgba(255,0,0,${0.02 + perspective * 0.15})`;
-
-    ctx.moveTo(-w, y + Math.sin(time * 0.001 + y * 0.02) * 4);
-    ctx.lineTo(w, y);
-
-    ctx.stroke();
-  }
-
-  for (let x = -w; x < w; x += spacing) {
-    ctx.beginPath();
-
-    const glow = Math.sin(time * 0.002 + x * 0.01);
-
-    ctx.strokeStyle = `rgba(255,20,20,${0.06 + glow * 0.03})`;
-
-    ctx.moveTo(x, -h);
-    ctx.lineTo(x, h);
-
-    ctx.stroke();
-  }
-
-  ctx.restore();
+for(let i=0;i<sparkCount;i++){
+    particles.push({
+        x:Math.random()*w,
+        y:Math.random()*h,
+        size:Math.random()*2,
+        speedY:Math.random()*0.5 + 0.2,
+        opacity:Math.random(),
+    });
 }
 
-/* =========================
-   PARTICLES
-========================= */
+let mouse = {
+    x:w/2,
+    y:h/2
+};
 
-class Particle {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
+window.addEventListener("mousemove", e=>{
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
 
-    const angle = Math.random() * Math.PI * 2;
-    const speed = Math.random() * 6 + 1;
-
-    this.vx = Math.cos(angle) * speed;
-    this.vy = Math.sin(angle) * speed;
-
-    this.life = 100;
-    this.size = Math.random() * 3 + 1;
-  }
-
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.life--;
-
-    this.vx *= 0.99;
-    this.vy *= 0.99;
-  }
-
-  draw() {
+function roundedRect(x,y,width,height,radius){
     ctx.beginPath();
+    ctx.moveTo(x+radius,y);
+    ctx.lineTo(x+width-radius,y);
+    ctx.quadraticCurveTo(x+width,y,x+width,y+radius);
+    ctx.lineTo(x+width,y+height-radius);
+    ctx.quadraticCurveTo(x+width,y+height,x+width-radius,y+height);
+    ctx.lineTo(x+radius,y+height);
+    ctx.quadraticCurveTo(x,y+height,x,y+height-radius);
+    ctx.lineTo(x,y+radius);
+    ctx.quadraticCurveTo(x,y,x+radius,y);
+    ctx.closePath();
+}
 
-    ctx.fillStyle = `rgba(255,0,0,${this.life / 100})`;
+function drawPhone(cx, cy, scale, rotation){
+    ctx.save();
 
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = "#ff0000";
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation);
 
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.shadowColor = "#57d6ff";
+    ctx.shadowBlur = 40;
 
+    // hinge
+    ctx.fillStyle = "#78e2ff";
+    roundedRect(-18*scale, -10*scale, 36*scale, 20*scale, 10*scale);
     ctx.fill();
 
-    ctx.shadowBlur = 0;
-  }
-}
+    // top
+    ctx.fillStyle = "#9be8ff";
+    roundedRect(-80*scale, -210*scale, 160*scale, 180*scale, 22*scale);
+    ctx.fill();
 
-/* =========================
-   ORBS
-========================= */
+    // bottom
+    roundedRect(-90*scale, 20*scale, 180*scale, 220*scale, 22*scale);
+    ctx.fill();
 
-function drawOrbs(time) {
-  for (let i = 0; i < 5; i++) {
-    const x = w / 2 + Math.sin(time * 0.0004 + i) * 400;
-    const y = h / 2 + Math.cos(time * 0.0006 + i * 2) * 250;
+    // screen
+    ctx.fillStyle = "#7ed6ff";
+    ctx.shadowBlur = 25;
+    roundedRect(-45*scale, -175*scale, 90*scale, 70*scale, 12*scale);
+    ctx.fill();
 
-    const radius = 60 + Math.sin(time * 0.002 + i) * 20;
-
-    const grad = ctx.createRadialGradient(
-      x, y, 0,
-      x, y, radius
-    );
-
-    grad.addColorStop(0, "rgba(255,0,0,0.35)");
-    grad.addColorStop(1, "rgba(255,0,0,0)");
+    // glowing screen
+    const grad = ctx.createLinearGradient(0,-175*scale,0,-105*scale);
+    grad.addColorStop(0,"#d9ffff");
+    grad.addColorStop(1,"#7dd8ff");
 
     ctx.fillStyle = grad;
+    roundedRect(-40*scale, -170*scale, 80*scale, 60*scale, 10*scale);
+    ctx.fill();
+
+    // keypad
+    ctx.shadowBlur = 12;
+
+    for(let row=0; row<4; row++){
+        for(let col=0; col<3; col++){
+            let x = -45*scale + col*40*scale;
+            let y = 70*scale + row*35*scale;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 12*scale, 0, Math.PI*2);
+
+            const buttonGrad = ctx.createRadialGradient(
+                x,y,1,
+                x,y,14*scale
+            );
+
+            buttonGrad.addColorStop(0, "#d6ffff");
+            buttonGrad.addColorStop(1, "#4ab7ff");
+
+            ctx.fillStyle = buttonGrad;
+            ctx.fill();
+        }
+    }
+
+    // antenna spark
+    ctx.strokeStyle = "#c8f7ff";
+    ctx.lineWidth = 3*scale;
+    ctx.beginPath();
+    ctx.moveTo(0,-210*scale);
+    ctx.quadraticCurveTo(
+        40*scale,
+        -260*scale,
+        70*scale,
+        -230*scale
+    );
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+function drawStarPhone(cx, cy, scale, rotation){
+    ctx.save();
+
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation);
+
+    ctx.shadowColor = "#7be8ff";
+    ctx.shadowBlur = 45;
+
+    ctx.fillStyle = "#b5f4ff";
 
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
 
-/* =========================
-   MOUSE ENERGY
-========================= */
-
-window.addEventListener("mousemove", e => {
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
-});
-
-window.addEventListener("click", e => {
-  for (let i = 0; i < 80; i++) {
-    particles.push(new Particle(e.clientX, e.clientY));
-  }
-});
-
-/* =========================
-   GLITCH LINES
-========================= */
-
-function drawGlitches(time) {
-  for (let i = 0; i < 10; i++) {
-    const y = (Math.sin(time * 0.002 + i * 8) * 0.5 + 0.5) * h;
-
-    ctx.fillStyle = `rgba(255,0,0,${Math.random() * 0.06})`;
-
-    ctx.fillRect(
-      Math.random() * 100,
-      y,
-      w,
-      Math.random() * 3
-    );
-  }
-}
-
-/* =========================
-   MAIN LOOP
-========================= */
-
-function animate(time) {
-  ctx.clearRect(0, 0, w, h);
-
-  /* Background gradient */
-  const bg = ctx.createRadialGradient(
-    w / 2,
-    h / 2,
-    0,
-    w / 2,
-    h / 2,
-    w
-  );
-
-  bg.addColorStop(0, "#220000");
-  bg.addColorStop(0.5, "#090000");
-  bg.addColorStop(1, "#000000");
-
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-
-  drawGrid(time);
-  drawOrbs(time);
-
-  /* Mouse glow */
-  const glow = ctx.createRadialGradient(
-    mouse.x,
-    mouse.y,
-    0,
-    mouse.x,
-    mouse.y,
-    200
-  );
-
-  glow.addColorStop(0, "rgba(255,0,0,0.15)");
-  glow.addColorStop(1, "rgba(255,0,0,0)");
-
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, w, h);
-
-  drawGlitches(time);
-
-  /* Particles */
-  particles.forEach((p, i) => {
-    p.update();
-    p.draw();
-
-    if (p.life <= 0) {
-      particles.splice(i, 1);
+    for(let i=0;i<5;i++){
+        ctx.lineTo(
+            Math.cos((18+i*72)/180*Math.PI)*120*scale,
+            -Math.sin((18+i*72)/180*Math.PI)*120*scale
+        );
+        ctx.lineTo(
+            Math.cos((54+i*72)/180*Math.PI)*50*scale,
+            -Math.sin((54+i*72)/180*Math.PI)*50*scale
+        );
     }
-  });
 
-  requestAnimationFrame(animate);
+    ctx.closePath();
+    ctx.fill();
+
+    // screen
+    ctx.fillStyle="#68d4ff";
+    ctx.beginPath();
+    ctx.arc(0,-20*scale,40*scale,0,Math.PI*2);
+    ctx.fill();
+
+    // buttons
+    for(let i=0;i<6;i++){
+        ctx.beginPath();
+        ctx.arc(
+            -35*scale + (i%3)*35*scale,
+            40*scale + Math.floor(i/3)*35*scale,
+            10*scale,
+            0,
+            Math.PI*2
+        );
+        ctx.fillStyle="#d8ffff";
+        ctx.fill();
+    }
+
+    ctx.restore();
 }
 
-animate(0);
+function animate(){
+    ctx.clearRect(0,0,w,h);
+
+    // floating particles
+    particles.forEach(p=>{
+        p.y -= p.speedY;
+
+        if(p.y < -10){
+            p.y = h + 10;
+            p.x = Math.random()*w;
+        }
+
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(130,220,255,${p.opacity})`;
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fill();
+    });
+
+    // glow trail
+    ctx.beginPath();
+    const glow = ctx.createRadialGradient(
+        mouse.x,
+        mouse.y,
+        0,
+        mouse.x,
+        mouse.y,
+        180
+    );
+
+    glow.addColorStop(0,"rgba(120,220,255,.15)");
+    glow.addColorStop(1,"rgba(120,220,255,0)");
+
+    ctx.fillStyle = glow;
+    ctx.arc(mouse.x,mouse.y,180,0,Math.PI*2);
+    ctx.fill();
+
+    // floating phones
+    const t = Date.now() * 0.001;
+
+    drawPhone(
+        w*0.35 + Math.sin(t)*30,
+        h*0.5 + Math.cos(t*1.2)*20,
+        1,
+        Math.sin(t)*0.15
+    );
+
+    drawStarPhone(
+        w*0.72 + Math.cos(t*0.8)*25,
+        h*0.42 + Math.sin(t)*20,
+        .9,
+        Math.cos(t)*0.2
+    );
+
+    requestAnimationFrame(animate);
+}
+
+animate();
 </script>
 
 </body>
