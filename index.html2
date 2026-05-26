@@ -335,3 +335,51 @@ animate();
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Y2K CALL HUNT</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    background:
+    radial-gradient(circle at top,#163f82 0%,#07111f 35%,#010208 100%);
+    font-family:Verdana,sans-serif;
+}
+
+canvas{
+    position:fixed;
+    inset:0;
+}
+
+.ui{
+    position:fixed;
+    top:20px;
+    left:20px;
+    z-index:10;
+    color:#9ce6ff;
+    text-shadow:
+        0 0 6px #5ad4ff,
+        0 0 18px #5ad4ff;
+    letter-spacing:2px;
+    font-size:14px;
+    user-select:none;
+}
+
+.title{
+    position:fixed;
+    width:100%;
+    top:20px;
+    text-align:center;
+    color:#b7eeff;
+    font-size:16px;
+   
