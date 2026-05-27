@@ -3,746 +3,510 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>Squidward Computer</title>
+<title>Squidward Computer Game</title>
 
 <style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        user-select:none;
+    }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+    body{
+        overflow:hidden;
+        width:100vw;
+        height:100vh;
+        font-family:Arial, sans-serif;
 
-body{
-  overflow:hidden;
-  width:100vw;
-  height:100vh;
+        /* FULL BACKGROUND */
+        background-image:url("https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg");
+        background-size:cover;
+        background-position:center;
+        background-repeat:no-repeat;
+    }
 
-  background-image:url('https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-}
+    /* =========================
+       DRAGGABLE COMPUTER
+    ========================== */
+    #computerWidget{
+        position:absolute;
+        width:900px;
+        height:650px;
+        left:50%;
+        top:50%;
+        transform:translate(-50%, -50%);
+        cursor:grab;
+    }
 
-#computer{
-  position:absolute;
+    #computerWidget.dragging{
+        cursor:grabbing;
+    }
 
-  width:620px;
+    /* COMPUTER IMAGE */
+    #computerShell{
+        position:absolute;
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        pointer-events:none;
+    }
 
-  left:50%;
-  top:50%;
+    /* =========================
+       GAME SCREEN AREA
+       Adjust values to perfectly fit
+       your squidwardcomputer3.png
+    ========================== */
+    #screenArea{
+        position:absolute;
 
-  transform:translate(-50%, -50%);
+        top:105px;
+        left:205px;
 
-  cursor:grab;
-  user-select:none;
+        width:485px;
+        height:285px;
 
-  animation:floaty 4s ease-in-out infinite;
-}
+        overflow:hidden;
+        border-radius:8px;
+        background:#ffffff;
+        border:4px solid #000;
+    }
 
-@keyframes floaty{
-  0%{
-    transform:translate(-50%, -50%) translateY(0px);
-  }
-  50%{
-    transform:translate(-50%, -50%) translateY(-10px);
-  }
-  100%{
-    transform:translate(-50%, -50%) translateY(0px);
-  }
-}
+    canvas{
+        width:100%;
+        height:100%;
+        display:block;
+        background:linear-gradient(to bottom, #8ee7ff, #ffffff);
+    }
 
-#computer.dragging{
-  animation:none;
-  cursor:grabbing;
-}
+    /* =========================
+       KEYBOARD BUTTON MAP
+       (using klaviatuur.png)
+    ========================== */
 
-#computer img{
-  width:100%;
-  display:block;
-}
+    #keyboardOverlay{
+        position:absolute;
 
-/* invisible clickable areas over EXISTING buttons */
+        left:180px;
+        bottom:85px;
 
-.hotspot{
-  position:absolute;
-  background:transparent;
-  cursor:pointer;
-}
+        width:540px;
+        height:135px;
 
-/* POWER BUTTON */
-#powerZone{
-  width:34px;
-  height:34px;
+        pointer-events:none;
+    }
 
-  left:97px;
-  top:330px;
+    .keyButton{
+        position:absolute;
+        pointer-events:auto;
 
-  border-radius:50%;
-}
+        background:rgba(255,255,255,0);
+        border:none;
+        cursor:pointer;
+    }
 
-/* PLAY BUTTON */
-#playZone{
-  width:50px;
-  height:50px;
+    .keyButton:hover{
+        background:rgba(255,255,255,0.08);
+    }
 
-  left:195px;
-  bottom:55px;
-}
+    /* BIG SPACE BUTTON */
+    #jumpButton{
+        left:110px;
+        top:55px;
+        width:320px;
+        height:45px;
+    }
 
-/* JUMP BUTTON */
-#jumpZone{
-  width:65px;
-  height:65px;
+    /* LEFT BUTTON */
+    #leftButton{
+        left:25px;
+        top:55px;
+        width:70px;
+        height:45px;
+    }
 
-  left:270px;
-  bottom:47px;
-}
+    /* RIGHT BUTTON */
+    #rightButton{
+        right:25px;
+        top:55px;
+        width:70px;
+        height:45px;
+    }
+
+    /* SCORE */
+    #score{
+        position:absolute;
+        top:10px;
+        left:15px;
+        font-size:22px;
+        font-weight:bold;
+        color:#000;
+        z-index:10;
+    }
+
+    #gameOver{
+        position:absolute;
+        inset:0;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        flex-direction:column;
+        background:rgba(0,0,0,0.5);
+        color:white;
+        font-size:32px;
+        font-weight:bold;
+        opacity:0;
+        pointer-events:none;
+        transition:0.3s;
+    }
+
+    #gameOver.show{
+        opacity:1;
+        pointer-events:auto;
+    }
+
+    #restartBtn{
+        margin-top:20px;
+        padding:12px 24px;
+        border:none;
+        border-radius:12px;
+        background:#ffeb3b;
+        cursor:pointer;
+        font-size:20px;
+        font-weight:bold;
+    }
 
 </style>
 </head>
 
 <body>
 
-<div id="computer">
+<!-- =========================
+     COMPUTER WIDGET
+========================= -->
+<div id="computerWidget">
 
-  <img src="squidwardcomputer3.png" alt="Computer">
+    <!-- COMPUTER IMAGE -->
+    <img id="computerShell" src="squidwardcomputer3.png" alt="computer"/>
 
-  <div id="powerZone" class="hotspot"></div>
-  <div id="playZone" class="hotspot"></div>
-  <div id="jumpZone" class="hotspot"></div>
+    <!-- GAME SCREEN -->
+    <div id="screenArea">
+
+        <div id="score">Score: 0</div>
+
+        <canvas id="gameCanvas" width="485" height="285"></canvas>
+
+        <div id="gameOver">
+            GAME OVER
+            <button id="restartBtn">RESTART</button>
+        </div>
+
+    </div>
+
+    <!-- KEYBOARD INTERACTIVE AREAS -->
+    <div id="keyboardOverlay">
+
+        <button class="keyButton" id="leftButton"></button>
+        <button class="keyButton" id="jumpButton"></button>
+        <button class="keyButton" id="rightButton"></button>
+
+    </div>
 
 </div>
 
 <script>
+/* ===================================================
+   DRAGGABLE COMPUTER
+=================================================== */
 
-const computer = document.getElementById('computer');
-
-const powerZone = document.getElementById('powerZone');
-const playZone = document.getElementById('playZone');
-const jumpZone = document.getElementById('jumpZone');
-
-/* =========================
-   DRAGGING
-========================= */
+const widget = document.getElementById("computerWidget");
 
 let isDragging = false;
 let offsetX = 0;
 let offsetY = 0;
 
-computer.addEventListener('mousedown', (e)=>{
+widget.addEventListener("mousedown", (e) => {
 
-  if(e.target.classList.contains('hotspot')) return;
+    // prevent dragging when clicking keyboard buttons
+    if(e.target.classList.contains("keyButton")) return;
 
-  isDragging = true;
+    isDragging = true;
+    widget.classList.add("dragging");
 
-  const rect = computer.getBoundingClientRect();
-
-  offsetX = e.clientX - rect.left;
-  offsetY = e.clientY - rect.top;
-
-  computer.style.left = rect.left + 'px';
-  computer.style.top = rect.top + 'px';
-
-  computer.style.transform = 'none';
-
-  computer.classList.add('dragging');
-
+    offsetX = e.clientX - widget.offsetLeft;
+    offsetY = e.clientY - widget.offsetTop;
 });
 
-document.addEventListener('mousemove', (e)=>{
+document.addEventListener("mousemove", (e) => {
+    if(!isDragging) return;
 
-  if(!isDragging) return;
-
-  computer.style.left = (e.clientX - offsetX) + 'px';
-  computer.style.top = (e.clientY - offsetY) + 'px';
-
+    widget.style.left = `${e.clientX - offsetX}px`;
+    widget.style.top = `${e.clientY - offsetY}px`;
+    widget.style.transform = `translate(0,0)`;
 });
 
-document.addEventListener('mouseup', ()=>{
-
-  isDragging = false;
-
+document.addEventListener("mouseup", () => {
+    isDragging = false;
+    widget.classList.remove("dragging");
 });
+
+
+/* ===================================================
+   GAME
+=================================================== */
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const scoreEl = document.getElementById("score");
+const gameOverEl = document.getElementById("gameOver");
+const restartBtn = document.getElementById("restartBtn");
+
+let score = 0;
+let gameRunning = true;
 
 /* =========================
-   EXISTING BUTTONS
+   SPONGEBOB
 ========================= */
 
-powerZone.addEventListener('click', ()=>{
-
-  computer.style.opacity =
-    computer.style.opacity === '0.4'
-    ? '1'
-    : '0.4';
-
-});
-
-playZone.addEventListener('click', ()=>{
-
-  computer.style.transform += ' scale(1.03)';
-
-  setTimeout(()=>{
-    computer.style.transform =
-      computer.style.transform.replace(' scale(1.03)', '');
-  },150);
-
-});
-
-jumpZone.addEventListener('click', ()=>{
-
-  computer.animate([
-    { transform:'translateY(0px)' },
-    { transform:'translateY(-120px)' },
-    { transform:'translateY(0px)' }
-  ],{
-    duration:600,
-    easing:'ease-out'
-  });
-
-});
-
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>Squidward Computer</title>
-
-<style>
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-body{
-  overflow:hidden;
-  width:100vw;
-  height:100vh;
-
-  background-image:url('https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-}
-
-#computer{
-  position:absolute;
-
-  width:620px;
-
-  left:50%;
-  top:50%;
-
-  transform:translate(-50%, -50%);
-
-  cursor:grab;
-  user-select:none;
-}
-
-#computer.dragging{
-  cursor:grabbing;
-}
-
-#computer img{
-  width:100%;
-  display:block;
-}
-
-/* SCREEN */
-
-#screen{
-  position:absolute;
-
-  left:148px;
-  top:94px;
-
-  width:325px;
-  height:187px;
-
-  background:white;
-
-  opacity:0;
-
-  transition:opacity 0.2s ease;
-
-  border-radius:6px;
-
-  pointer-events:none;
-}
-
-/* INVISIBLE HOTSPOTS
-   placed over REAL buttons
-   already inside image
-*/
-
-.hotspot{
-  position:absolute;
-  background:transparent;
-  cursor:pointer;
-}
-
-/* REAL POWER BUTTON
-   top-left keyboard area
-*/
-
-#powerZone{
-  width:30px;
-  height:30px;
-
-  left:90px;
-  top:327px;
-
-  border-radius:50%;
-}
-
-/* PLAY BUTTON */
-
-#playZone{
-  width:50px;
-  height:50px;
-
-  left:195px;
-  bottom:55px;
-}
-
-/* JUMP BUTTON */
-
-#jumpZone{
-  width:65px;
-  height:65px;
-
-  left:270px;
-  bottom:47px;
-}
-
-</style>
-</head>
-
-<body>
-
-<div id="computer">
-
-  <div id="screen"></div>
-
-  <img src="squidwardcomputer3.png" alt="Computer">
-
-  <div id="powerZone" class="hotspot"></div>
-  <div id="playZone" class="hotspot"></div>
-  <div id="jumpZone" class="hotspot"></div>
-
-</div>
-
-<script>
-
-const computer = document.getElementById('computer');
-
-const screen = document.getElementById('screen');
-
-const powerZone = document.getElementById('powerZone');
-const playZone = document.getElementById('playZone');
-const jumpZone = document.getElementById('jumpZone');
-
-let poweredOn = false;
+const player = {
+    x: 60,
+    y: 180,
+    width: 55,
+    height: 70,
+    velocityY: 0,
+    gravity: 0.7,
+    jumpForce: -14,
+    grounded: true
+};
 
 /* =========================
-   DRAGGING
+   JELLYFISH
 ========================= */
 
-let isDragging = false;
-let offsetX = 0;
-let offsetY = 0;
+let obstacles = [];
 
-computer.addEventListener('mousedown', (e)=>{
+function createObstacle(){
+    const size = 50 + Math.random() * 20;
 
-  if(e.target.classList.contains('hotspot')) return;
+    obstacles.push({
+        x: canvas.width + 50,
+        y: 190,
+        width: size,
+        height: size,
+        speed: 6 + Math.random() * 2
+    });
+}
 
-  isDragging = true;
+setInterval(() => {
+    if(gameRunning){
+        createObstacle();
+    }
+}, 1600);
 
-  const rect = computer.getBoundingClientRect();
 
-  offsetX = e.clientX - rect.left;
-  offsetY = e.clientY - rect.top;
+/* ===================================================
+   DRAW FUNCTIONS
+=================================================== */
 
-  computer.style.left = rect.left + 'px';
-  computer.style.top = rect.top + 'px';
+function drawPlayer(){
 
-  computer.style.transform = 'none';
+    // BODY
+    ctx.fillStyle = "#ffe23b";
+    ctx.fillRect(player.x, player.y, player.width, player.height);
 
-  computer.classList.add('dragging');
+    // EYES
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(player.x + 18, player.y + 20, 8, 0, Math.PI * 2);
+    ctx.arc(player.x + 38, player.y + 20, 8, 0, Math.PI * 2);
+    ctx.fill();
 
+    // PUPILS
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    ctx.arc(player.x + 18, player.y + 20, 3, 0, Math.PI * 2);
+    ctx.arc(player.x + 38, player.y + 20, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // SMILE
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(player.x + 28, player.y + 40, 10, 0, Math.PI);
+    ctx.stroke();
+}
+
+function drawObstacle(ob){
+
+    // JELLYFISH TOP
+    ctx.fillStyle = "#ff5fd7";
+
+    ctx.beginPath();
+    ctx.arc(
+        ob.x + ob.width / 2,
+        ob.y + ob.height / 2 - 10,
+        ob.width / 2,
+        Math.PI,
+        0
+    );
+
+    ctx.fill();
+
+    // BODY
+    ctx.fillRect(
+        ob.x,
+        ob.y + 10,
+        ob.width,
+        ob.height / 2
+    );
+
+    // TENTACLES
+    ctx.strokeStyle = "#ff5fd7";
+    ctx.lineWidth = 3;
+
+    for(let i=0;i<4;i++){
+
+        ctx.beginPath();
+
+        const startX = ob.x + 10 + i*12;
+        const startY = ob.y + ob.height / 2 + 10;
+
+        ctx.moveTo(startX, startY);
+
+        ctx.lineTo(
+            startX + Math.sin(Date.now()/100 + i)*8,
+            startY + 20
+        );
+
+        ctx.stroke();
+    }
+}
+
+
+/* ===================================================
+   UPDATE
+=================================================== */
+
+function update(){
+
+    if(!gameRunning) return;
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // FLOOR
+    ctx.fillStyle = "#5dd65d";
+    ctx.fillRect(0, 250, canvas.width, 35);
+
+    /* PLAYER PHYSICS */
+
+    player.velocityY += player.gravity;
+    player.y += player.velocityY;
+
+    // ground
+    if(player.y >= 180){
+        player.y = 180;
+        player.velocityY = 0;
+        player.grounded = true;
+    }
+
+    drawPlayer();
+
+    /* OBSTACLES */
+
+    for(let i = obstacles.length - 1; i >= 0; i--){
+
+        const ob = obstacles[i];
+
+        ob.x -= ob.speed;
+
+        drawObstacle(ob);
+
+        // collision
+        if(
+            player.x < ob.x + ob.width &&
+            player.x + player.width > ob.x &&
+            player.y < ob.y + ob.height &&
+            player.y + player.height > ob.y
+        ){
+            endGame();
+        }
+
+        // score
+        if(!ob.scored && ob.x + ob.width < player.x){
+            ob.scored = true;
+            score++;
+            scoreEl.innerText = "Score: " + score;
+        }
+
+        // remove
+        if(ob.x + ob.width < -50){
+            obstacles.splice(i,1);
+        }
+    }
+
+    requestAnimationFrame(update);
+}
+
+update();
+
+
+/* ===================================================
+   CONTROLS
+=================================================== */
+
+function jump(){
+
+    if(player.grounded){
+        player.velocityY = player.jumpForce;
+        player.grounded = false;
+    }
+}
+
+// keyboard
+document.addEventListener("keydown", (e) => {
+
+    if(e.code === "Space" || e.code === "ArrowUp"){
+        jump();
+    }
 });
 
-document.addEventListener('mousemove', (e)=>{
+// clickable keyboard buttons
+document.getElementById("jumpButton").addEventListener("click", jump);
 
-  if(!isDragging) return;
-
-  computer.style.left = (e.clientX - offsetX) + 'px';
-  computer.style.top = (e.clientY - offsetY) + 'px';
-
+document.getElementById("leftButton").addEventListener("click", () => {
+    widget.style.transform += " rotate(-1deg)";
 });
 
-document.addEventListener('mouseup', ()=>{
-
-  isDragging = false;
-
-  computer.classList.remove('dragging');
-
+document.getElementById("rightButton").addEventListener("click", () => {
+    widget.style.transform += " rotate(1deg)";
 });
 
-/* =========================
-   POWER BUTTON
-========================= */
 
-powerZone.addEventListener('click', ()=>{
+/* ===================================================
+   GAME OVER
+=================================================== */
 
-  poweredOn = !poweredOn;
-
-  if(poweredOn){
-
-    screen.style.opacity = '1';
-
-  }else{
-
-    screen.style.opacity = '0';
-
-  }
-
-});
-
-/* =========================
-   PLAY BUTTON
-========================= */
-
-playZone.addEventListener('click', ()=>{
-
-  if(!poweredOn) return;
-
-  computer.animate([
-    { transform:'scale(1)' },
-    { transform:'scale(1.03)' },
-    { transform:'scale(1)' }
-  ],{
-    duration:180
-  });
-
-});
-
-/* =========================
-   JUMP BUTTON
-========================= */
-
-jumpZone.addEventListener('click', ()=>{
-
-  if(!poweredOn) return;
-
-  computer.animate([
-    { transform:'translateY(0px)' },
-    { transform:'translateY(-120px)' },
-    { transform:'translateY(0px)' }
-  ],{
-    duration:600,
-    easing:'ease-out'
-  });
-
-});
-
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>Squidward Computer</title>
-
-<style>
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+function endGame(){
+    gameRunning = false;
+    gameOverEl.classList.add("show");
 }
 
-body{
-  overflow:hidden;
-  width:100vw;
-  height:100vh;
+restartBtn.addEventListener("click", () => {
 
-  background-image:url('https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-}
+    obstacles = [];
+    score = 0;
 
-/* COMPUTER */
+    scoreEl.innerText = "Score: 0";
 
-#computer{
-  position:absolute;
+    player.y = 180;
+    player.velocityY = 0;
 
-  width:620px;
+    gameRunning = true;
 
-  left:50%;
-  top:50%;
+    gameOverEl.classList.remove("show");
 
-  transform:translate(-50%, -50%);
-
-  cursor:grab;
-  user-select:none;
-
-  will-change:left, top;
-}
-
-#computer.dragging{
-  cursor:grabbing;
-}
-
-#computer img{
-  width:100%;
-  display:block;
-  pointer-events:none;
-}
-
-/* SCREEN */
-
-#screen{
-  position:absolute;
-
-  left:148px;
-  top:94px;
-
-  width:325px;
-  height:187px;
-
-  background:white;
-
-  opacity:0;
-
-  transition:opacity 0.2s ease;
-
-  border-radius:6px;
-
-  pointer-events:none;
-}
-
-/* HOTSPOTS */
-
-.hotspot{
-  position:absolute;
-  background:transparent;
-  cursor:pointer;
-}
-
-/* POWER BUTTON */
-
-#powerZone{
-  width:30px;
-  height:30px;
-
-  left:90px;
-  top:327px;
-
-  border-radius:50%;
-}
-
-/* PLAY BUTTON */
-
-#playZone{
-  width:50px;
-  height:50px;
-
-  left:195px;
-  bottom:55px;
-}
-
-/* JUMP BUTTON */
-
-#jumpZone{
-  width:65px;
-  height:65px;
-
-  left:270px;
-  bottom:47px;
-}
-
-</style>
-</head>
-
-<body>
-
-<div id="computer">
-
-  <div id="screen"></div>
-
-  <img src="squidwardcomputer3.png" alt="Computer">
-
-  <!-- EXISTING BUTTONS -->
-  <div id="powerZone" class="hotspot"></div>
-  <div id="playZone" class="hotspot"></div>
-  <div id="jumpZone" class="hotspot"></div>
-
-</div>
-
-<script>
-
-const computer = document.getElementById('computer');
-
-const screen = document.getElementById('screen');
-
-const powerZone = document.getElementById('powerZone');
-const playZone = document.getElementById('playZone');
-const jumpZone = document.getElementById('jumpZone');
-
-let poweredOn = false;
-
-/* =========================
-   SMOOTH DRAGGING
-========================= */
-
-let isDragging = false;
-
-let currentX = window.innerWidth / 2;
-let currentY = window.innerHeight / 2;
-
-let targetX = currentX;
-let targetY = currentY;
-
-let offsetX = 0;
-let offsetY = 0;
-
-computer.style.left = currentX + 'px';
-computer.style.top = currentY + 'px';
-
-computer.style.transform = 'translate(-50%, -50%)';
-
-computer.addEventListener('mousedown', (e)=>{
-
-  if(e.target.classList.contains('hotspot')) return;
-
-  isDragging = true;
-
-  computer.classList.add('dragging');
-
-  const rect = computer.getBoundingClientRect();
-
-  offsetX = e.clientX - rect.left;
-  offsetY = e.clientY - rect.top;
-
-});
-
-document.addEventListener('mousemove', (e)=>{
-
-  if(!isDragging) return;
-
-  targetX = e.clientX - offsetX + (computer.offsetWidth / 2);
-  targetY = e.clientY - offsetY + (computer.offsetHeight / 2);
-
-});
-
-document.addEventListener('mouseup', ()=>{
-
-  isDragging = false;
-
-  computer.classList.remove('dragging');
-
-});
-
-/* smooth animation loop */
-
-function smoothMove(){
-
-  currentX += (targetX - currentX) * 0.14;
-  currentY += (targetY - currentY) * 0.14;
-
-  computer.style.left = currentX + 'px';
-
-  requestAnimationFrame(smoothMove);
-
-}
-
-smoothMove();
-
-/* =========================
-   BUTTON PRESS EFFECT
-========================= */
-
-function pressButton(button){
-
-  button.animate([
-    { transform:'translateY(0px)' },
-    { transform:'translateY(4px)' },
-    { transform:'translateY(0px)' }
-  ],{
-    duration:140,
-    easing:'ease-out'
-  });
-
-}
-
-/* =========================
-   POWER BUTTON
-========================= */
-
-powerZone.addEventListener('click', ()=>{
-
-  pressButton(powerZone);
-
-  poweredOn = !poweredOn;
-
-  if(poweredOn){
-
-    screen.style.opacity = '1';
-
-  }else{
-
-    screen.style.opacity = '0';
-
-  }
-
-});
-
-/* =========================
-   PLAY BUTTON
-========================= */
-
-playZone.addEventListener('click', ()=>{
-
-  if(!poweredOn) return;
-
-  pressButton(playZone);
-
-});
-
-/* =========================
-   JUMP BUTTON
-========================= */
-
-jumpZone.addEventListener('click', ()=>{
-
-  if(!poweredOn) return;
-
-  pressButton(jumpZone);
-
-  computer.animate([
-    { transform:'translate(-50%, -50%) translateY(0px)' },
-    { transform:'translate(-50%, -50%) translateY(-120px)' },
-    { transform:'translate(-50%, -50%) translateY(0px)' }
-  ],{
-    duration:600,
-    easing:'ease-out'
-  });
-
+    update();
 });
 
 </script>
