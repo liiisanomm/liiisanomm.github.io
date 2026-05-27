@@ -486,6 +486,8 @@ body{
   background-repeat:no-repeat;
 }
 
+/* COMPUTER */
+
 #computer{
   position:absolute;
 
@@ -499,9 +501,7 @@ body{
   cursor:grab;
   user-select:none;
 
-  transition:
-    left 0.05s linear,
-    top 0.05s linear;
+  will-change:left, top;
 }
 
 #computer.dragging{
@@ -536,7 +536,7 @@ body{
   pointer-events:none;
 }
 
-/* INVISIBLE HOTSPOTS */
+/* HOTSPOTS */
 
 .hotspot{
   position:absolute;
@@ -658,24 +658,24 @@ document.addEventListener('mouseup', ()=>{
 
 });
 
-/* smooth movement */
+/* smooth animation loop */
 
-function animate(){
+function smoothMove(){
 
-  currentX += (targetX - currentX) * 0.12;
-  currentY += (targetY - currentY) * 0.12;
+  currentX += (targetX - currentX) * 0.14;
+  currentY += (targetY - currentY) * 0.14;
 
   computer.style.left = currentX + 'px';
   computer.style.top = currentY + 'px';
 
-  requestAnimationFrame(animate);
+  requestAnimationFrame(smoothMove);
 
 }
 
-animate();
+smoothMove();
 
 /* =========================
-   BUTTON MOVEMENT
+   BUTTON PRESS EFFECT
 ========================= */
 
 function pressButton(button){
