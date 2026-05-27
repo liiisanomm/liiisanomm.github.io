@@ -3,143 +3,286 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Interactive Computer</title>
+  <title>Squidward Computer</title>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
     }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: sans-serif;
+    body{
+      overflow:hidden;
+      width:100vw;
+      height:100vh;
+      font-family:Arial, sans-serif;
+
+      /* FULL BACKGROUND IMAGE */
+      background-image:url('https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
     }
 
-    body {
-      background-image: url('https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      position: relative;
+    /* COMPUTER CONTAINER */
+    #computer{
+      position:absolute;
+      width:520px;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -50%);
+      cursor:grab;
+      user-select:none;
+      transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
+      z-index:10;
     }
 
-    /* Draggable computer */
-    #computer {
-      position: absolute;
-      width: 420px;
-      max-width: 70vw;
-      cursor: grab;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      transition: transform 0.05s linear;
-      z-index: 10;
-      touch-action: none;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+    #computer:active{
+      cursor:grabbing;
     }
 
-    #computer:active {
-      cursor: grabbing;
+    /* FLOATING ANIMATION */
+    .floating{
+      animation:floaty 4s ease-in-out infinite;
     }
 
-    /* Optional floating effect */
-    @keyframes floaty {
-      0% { transform: translate(-50%, -50%) translateY(0px); }
-      50% { transform: translate(-50%, -50%) translateY(-6px); }
-      100% { transform: translate(-50%, -50%) translateY(0px); }
-    }
-
-    .floating {
-      animation: floaty 3s ease-in-out infinite;
-    }
-
-    /* Mobile optimization */
-    @media (max-width: 768px) {
-      #computer {
-        width: 300px;
+    @keyframes floaty{
+      0%{
+        transform:translate(-50%, -50%) translateY(0px);
+      }
+      50%{
+        transform:translate(-50%, -50%) translateY(-12px);
+      }
+      100%{
+        transform:translate(-50%, -50%) translateY(0px);
       }
     }
+
+    /* COMPUTER IMAGE */
+    #computer img{
+      width:100%;
+      display:block;
+      pointer-events:none;
+    }
+
+    /* BUTTONS */
+    .button{
+      position:absolute;
+      border:none;
+      cursor:pointer;
+      border-radius:50%;
+      transition:
+        transform 0.1s,
+        box-shadow 0.2s,
+        background 0.2s;
+      z-index:20;
+    }
+
+    .button:hover{
+      transform:scale(1.08);
+    }
+
+    .button:active{
+      transform:scale(0.95);
+    }
+
+    /* POWER BUTTON */
+    #powerBtn{
+      width:26px;
+      height:26px;
+      background:#46ff6a;
+      box-shadow:0 0 15px #46ff6a;
+      top:275px;
+      left:85px;
+    }
+
+    .off{
+      background:#ff3b3b !important;
+      box-shadow:0 0 15px #ff3b3b !important;
+    }
+
+    /* PLAY BUTTON */
+    #playBtn{
+      width:42px;
+      height:42px;
+      background:#2f7dff;
+      bottom:52px;
+      left:175px;
+      border-radius:12px;
+      color:white;
+      font-size:18px;
+      font-weight:bold;
+    }
+
+    /* JUMP BUTTON */
+    #jumpBtn{
+      width:58px;
+      height:58px;
+      background:#ffc400;
+      bottom:44px;
+      left:240px;
+      border-radius:14px;
+      color:#222;
+      font-size:28px;
+      font-weight:bold;
+    }
+
+    /* SCREEN OVERLAY */
+    #screenOverlay{
+      position:absolute;
+      top:78px;
+      left:124px;
+      width:270px;
+      height:155px;
+      background:rgba(0,0,0,0);
+      transition:background 0.4s;
+      pointer-events:none;
+      border-radius:8px;
+    }
+
+    .screenOff{
+      background:rgba(0,0,0,0.92) !important;
+    }
+
+    /* PLAY EFFECT */
+    .playing{
+      filter:
+        drop-shadow(0 0 12px #4ca8ff)
+        brightness(1.1);
+    }
+
   </style>
 </head>
 
 <body>
 
-  <!-- Replace computer.png with your uploaded file name -->
-  <img
-    id="computer"
-    class="floating"
-    src="computer.png"
-    alt="Computer"
-    draggable="false"
-  />
+  <!-- COMPUTER -->
+  <div id="computer" class="floating">
+
+    <img src="squidwardcomputer.png" alt="Squidward Computer">
+
+    <!-- SCREEN OVERLAY -->
+    <div id="screenOverlay"></div>
+
+    <!-- POWER BUTTON -->
+    <button id="powerBtn" class="button"></button>
+
+    <!-- PLAY BUTTON -->
+    <button id="playBtn" class="button">▶</button>
+
+    <!-- JUMP BUTTON -->
+    <button id="jumpBtn" class="button">⬆</button>
+
+  </div>
 
   <script>
-    const computer = document.getElementById("computer");
+
+    const computer = document.getElementById('computer');
+    const powerBtn = document.getElementById('powerBtn');
+    const playBtn = document.getElementById('playBtn');
+    const jumpBtn = document.getElementById('jumpBtn');
+    const screenOverlay = document.getElementById('screenOverlay');
 
     let isDragging = false;
     let offsetX = 0;
     let offsetY = 0;
 
-    // Remove translate after first drag
-    let centered = true;
+    let poweredOn = true;
+    let playing = false;
 
-    function startDrag(x, y) {
+    // -----------------------------
+    // DRAGGING
+    // -----------------------------
+
+    computer.addEventListener('mousedown', (e) => {
+
+      // Prevent drag if clicking buttons
+      if(e.target.classList.contains('button')) return;
+
       isDragging = true;
 
       const rect = computer.getBoundingClientRect();
 
-      offsetX = x - rect.left;
-      offsetY = y - rect.top;
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
 
-      computer.classList.remove("floating");
+      computer.style.left = rect.left + 'px';
+      computer.style.top = rect.top + 'px';
+      computer.style.transform = 'none';
 
-      if (centered) {
-        computer.style.left = rect.left + "px";
-        computer.style.top = rect.top + "px";
-        computer.style.transform = "none";
-        centered = false;
-      }
-    }
+      computer.classList.remove('floating');
+    });
 
-    function drag(x, y) {
-      if (!isDragging) return;
+    document.addEventListener('mousemove', (e) => {
 
-      computer.style.left = (x - offsetX) + "px";
-      computer.style.top = (y - offsetY) + "px";
-    }
+      if(!isDragging) return;
 
-    function endDrag() {
+      computer.style.left = (e.clientX - offsetX) + 'px';
+      computer.style.top = (e.clientY - offsetY) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
       isDragging = false;
-    }
-
-    // Mouse Events
-    computer.addEventListener("mousedown", (e) => {
-      startDrag(e.clientX, e.clientY);
     });
 
-    document.addEventListener("mousemove", (e) => {
-      drag(e.clientX, e.clientY);
+    // -----------------------------
+    // POWER BUTTON
+    // -----------------------------
+
+    powerBtn.addEventListener('click', () => {
+
+      poweredOn = !poweredOn;
+
+      if(poweredOn){
+        powerBtn.classList.remove('off');
+        screenOverlay.classList.remove('screenOff');
+      } else {
+        powerBtn.classList.add('off');
+        screenOverlay.classList.add('screenOff');
+      }
+
     });
 
-    document.addEventListener("mouseup", endDrag);
+    // -----------------------------
+    // PLAY BUTTON
+    // -----------------------------
 
-    // Touch Events
-    computer.addEventListener("touchstart", (e) => {
-      const touch = e.touches[0];
-      startDrag(touch.clientX, touch.clientY);
+    playBtn.addEventListener('click', () => {
+
+      if(!poweredOn) return;
+
+      playing = !playing;
+
+      if(playing){
+        computer.classList.add('playing');
+      } else {
+        computer.classList.remove('playing');
+      }
+
     });
 
-    document.addEventListener("touchmove", (e) => {
-      const touch = e.touches[0];
-      drag(touch.clientX, touch.clientY);
+    // -----------------------------
+    // JUMP BUTTON
+    // -----------------------------
+
+    jumpBtn.addEventListener('click', () => {
+
+      if(!poweredOn) return;
+
+      computer.animate([
+        { transform:'translateY(0px)' },
+        { transform:'translateY(-80px)' },
+        { transform:'translateY(0px)' }
+      ],{
+        duration:500,
+        easing:'ease-out'
+      });
+
     });
 
-    document.addEventListener("touchend", endDrag);
   </script>
 
 </body>
