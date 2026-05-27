@@ -3,512 +3,222 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Squidward Computer Game</title>
+<title>Custom Widget Game</title>
 
 <style>
-    *{
-        margin:0;
-        padding:0;
-        box-sizing:border-box;
-        user-select:none;
+    body {
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        background: url("https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg") no-repeat center center fixed;
+        background-size: cover;
     }
 
-    body{
-        overflow:hidden;
-        width:100vw;
-        height:100vh;
-        font-family:Arial, sans-serif;
-
-        /* FULL BACKGROUND */
-        background-image:url("https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg");
-        background-size:cover;
-        background-position:center;
-        background-repeat:no-repeat;
+    /* Draggable computer widget */
+    #computerWidget {
+        position: absolute;
+        width: 520px;
+        height: 420px;
+        background: url("squidwardcomputer4.png") no-repeat center center;
+        background-size: contain;
+        cursor: grab;
+        user-select: none;
     }
 
-    /* =========================
-       DRAGGABLE COMPUTER
-    ========================== */
-    #computerWidget{
-        position:absolute;
-        width:900px;
-        height:650px;
-        left:50%;
-        top:50%;
-        transform:translate(-50%, -50%);
-        cursor:grab;
+    #screen {
+        position: absolute;
+        top: 85px;
+        left: 70px;
+        width: 380px;
+        height: 210px;
+        background: black;
+        overflow: hidden;
+        border-radius: 8px;
     }
 
-    #computerWidget.dragging{
-        cursor:grabbing;
+    canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
     }
 
-    /* COMPUTER IMAGE */
-    #computerShell{
-        position:absolute;
-        width:100%;
-        height:100%;
-        object-fit:contain;
-        pointer-events:none;
+    /* Keyboard overlay */
+    #keyboard {
+        position: absolute;
+        bottom: 10px;
+        left: 70px;
+        width: 380px;
+        height: 110px;
+        background: url("klaviatuur.png") no-repeat center center;
+        background-size: contain;
     }
 
-    /* =========================
-       GAME SCREEN AREA
-       Adjust values to perfectly fit
-       your squidwardcomputer3.png
-    ========================== */
-    #screenArea{
-        position:absolute;
-
-        top:105px;
-        left:205px;
-
-        width:485px;
-        height:285px;
-
-        overflow:hidden;
-        border-radius:8px;
-        background:#ffffff;
-        border:4px solid #000;
+    /* Invisible jump button area on keyboard */
+    #jumpBtn {
+        position: absolute;
+        bottom: 20px;
+        left: 150px;
+        width: 120px;
+        height: 60px;
+        cursor: pointer;
     }
 
-    canvas{
-        width:100%;
-        height:100%;
-        display:block;
-        background:linear-gradient(to bottom, #8ee7ff, #ffffff);
+    #computerWidget:active {
+        cursor: grabbing;
     }
-
-    /* =========================
-       KEYBOARD BUTTON MAP
-       (using klaviatuur.png)
-    ========================== */
-
-    #keyboardOverlay{
-        position:absolute;
-
-        left:180px;
-        bottom:85px;
-
-        width:540px;
-        height:135px;
-
-        pointer-events:none;
-    }
-
-    .keyButton{
-        position:absolute;
-        pointer-events:auto;
-
-        background:rgba(255,255,255,0);
-        border:none;
-        cursor:pointer;
-    }
-
-    .keyButton:hover{
-        background:rgba(255,255,255,0.08);
-    }
-
-    /* BIG SPACE BUTTON */
-    #jumpButton{
-        left:110px;
-        top:55px;
-        width:320px;
-        height:45px;
-    }
-
-    /* LEFT BUTTON */
-    #leftButton{
-        left:25px;
-        top:55px;
-        width:70px;
-        height:45px;
-    }
-
-    /* RIGHT BUTTON */
-    #rightButton{
-        right:25px;
-        top:55px;
-        width:70px;
-        height:45px;
-    }
-
-    /* SCORE */
-    #score{
-        position:absolute;
-        top:10px;
-        left:15px;
-        font-size:22px;
-        font-weight:bold;
-        color:#000;
-        z-index:10;
-    }
-
-    #gameOver{
-        position:absolute;
-        inset:0;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        flex-direction:column;
-        background:rgba(0,0,0,0.5);
-        color:white;
-        font-size:32px;
-        font-weight:bold;
-        opacity:0;
-        pointer-events:none;
-        transition:0.3s;
-    }
-
-    #gameOver.show{
-        opacity:1;
-        pointer-events:auto;
-    }
-
-    #restartBtn{
-        margin-top:20px;
-        padding:12px 24px;
-        border:none;
-        border-radius:12px;
-        background:#ffeb3b;
-        cursor:pointer;
-        font-size:20px;
-        font-weight:bold;
-    }
-
 </style>
 </head>
 
 <body>
 
-<!-- =========================
-     COMPUTER WIDGET
-========================= -->
 <div id="computerWidget">
-
-    <!-- COMPUTER IMAGE -->
-    <img id="computerShell" src="squidwardcomputer3.png" alt="computer"/>
-
-    <!-- GAME SCREEN -->
-    <div id="screenArea">
-
-        <div id="score">Score: 0</div>
-
-        <canvas id="gameCanvas" width="485" height="285"></canvas>
-
-        <div id="gameOver">
-            GAME OVER
-            <button id="restartBtn">RESTART</button>
-        </div>
-
+    <div id="screen">
+        <canvas id="gameCanvas"></canvas>
     </div>
 
-    <!-- KEYBOARD INTERACTIVE AREAS -->
-    <div id="keyboardOverlay">
-
-        <button class="keyButton" id="leftButton"></button>
-        <button class="keyButton" id="jumpButton"></button>
-        <button class="keyButton" id="rightButton"></button>
-
+    <div id="keyboard">
+        <div id="jumpBtn"></div>
     </div>
-
 </div>
 
 <script>
-/* ===================================================
-   DRAGGABLE COMPUTER
-=================================================== */
-
+/* ---------------- DRAGGING ---------------- */
 const widget = document.getElementById("computerWidget");
 
 let isDragging = false;
-let offsetX = 0;
-let offsetY = 0;
+let offsetX, offsetY;
 
 widget.addEventListener("mousedown", (e) => {
-
-    // prevent dragging when clicking keyboard buttons
-    if(e.target.classList.contains("keyButton")) return;
-
     isDragging = true;
-    widget.classList.add("dragging");
-
     offsetX = e.clientX - widget.offsetLeft;
     offsetY = e.clientY - widget.offsetTop;
 });
 
 document.addEventListener("mousemove", (e) => {
-    if(!isDragging) return;
-
-    widget.style.left = `${e.clientX - offsetX}px`;
-    widget.style.top = `${e.clientY - offsetY}px`;
-    widget.style.transform = `translate(0,0)`;
+    if (isDragging) {
+        widget.style.left = (e.clientX - offsetX) + "px";
+        widget.style.top = (e.clientY - offsetY) + "px";
+    }
 });
 
 document.addEventListener("mouseup", () => {
     isDragging = false;
-    widget.classList.remove("dragging");
 });
 
-
-/* ===================================================
-   GAME
-=================================================== */
-
+/* ---------------- GAME ---------------- */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const scoreEl = document.getElementById("score");
-const gameOverEl = document.getElementById("gameOver");
-const restartBtn = document.getElementById("restartBtn");
+canvas.width = 380;
+canvas.height = 210;
 
-let score = 0;
-let gameRunning = true;
-
-/* =========================
-   SPONGEBOB
-========================= */
-
-const player = {
-    x: 60,
-    y: 180,
-    width: 55,
-    height: 70,
+let player = {
+    x: 50,
+    y: 160,
+    w: 20,
+    h: 20,
     velocityY: 0,
-    gravity: 0.7,
-    jumpForce: -14,
-    grounded: true
+    jumping: false
 };
 
-/* =========================
-   JELLYFISH
-========================= */
+let gravity = 0.8;
+let jumpPower = -12;
 
 let obstacles = [];
+let frame = 0;
+let gameOver = false;
 
-function createObstacle(){
-    const size = 50 + Math.random() * 20;
+function jump() {
+    if (!player.jumping) {
+        player.velocityY = jumpPower;
+        player.jumping = true;
+    }
+}
 
+document.addEventListener("keydown", (e) => {
+    if (e.code === "Space") jump();
+});
+
+document.getElementById("jumpBtn").addEventListener("click", jump);
+
+function spawnObstacle() {
     obstacles.push({
-        x: canvas.width + 50,
-        y: 190,
-        width: size,
-        height: size,
-        speed: 6 + Math.random() * 2
+        x: canvas.width,
+        y: 170,
+        w: 20,
+        h: 30,
+        speed: 4
     });
 }
 
-setInterval(() => {
-    if(gameRunning){
-        createObstacle();
+function updateGame() {
+    if (gameOver) return;
+
+    frame++;
+
+    // spawn jellyfish
+    if (frame % 90 === 0) {
+        spawnObstacle();
     }
-}, 1600);
 
-
-/* ===================================================
-   DRAW FUNCTIONS
-=================================================== */
-
-function drawPlayer(){
-
-    // BODY
-    ctx.fillStyle = "#ffe23b";
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-
-    // EYES
-    ctx.fillStyle = "white";
-    ctx.beginPath();
-    ctx.arc(player.x + 18, player.y + 20, 8, 0, Math.PI * 2);
-    ctx.arc(player.x + 38, player.y + 20, 8, 0, Math.PI * 2);
-    ctx.fill();
-
-    // PUPILS
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.arc(player.x + 18, player.y + 20, 3, 0, Math.PI * 2);
-    ctx.arc(player.x + 38, player.y + 20, 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // SMILE
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(player.x + 28, player.y + 40, 10, 0, Math.PI);
-    ctx.stroke();
-}
-
-function drawObstacle(ob){
-
-    // JELLYFISH TOP
-    ctx.fillStyle = "#ff5fd7";
-
-    ctx.beginPath();
-    ctx.arc(
-        ob.x + ob.width / 2,
-        ob.y + ob.height / 2 - 10,
-        ob.width / 2,
-        Math.PI,
-        0
-    );
-
-    ctx.fill();
-
-    // BODY
-    ctx.fillRect(
-        ob.x,
-        ob.y + 10,
-        ob.width,
-        ob.height / 2
-    );
-
-    // TENTACLES
-    ctx.strokeStyle = "#ff5fd7";
-    ctx.lineWidth = 3;
-
-    for(let i=0;i<4;i++){
-
-        ctx.beginPath();
-
-        const startX = ob.x + 10 + i*12;
-        const startY = ob.y + ob.height / 2 + 10;
-
-        ctx.moveTo(startX, startY);
-
-        ctx.lineTo(
-            startX + Math.sin(Date.now()/100 + i)*8,
-            startY + 20
-        );
-
-        ctx.stroke();
-    }
-}
-
-
-/* ===================================================
-   UPDATE
-=================================================== */
-
-function update(){
-
-    if(!gameRunning) return;
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    // FLOOR
-    ctx.fillStyle = "#5dd65d";
-    ctx.fillRect(0, 250, canvas.width, 35);
-
-    /* PLAYER PHYSICS */
-
-    player.velocityY += player.gravity;
+    // player physics
     player.y += player.velocityY;
+    player.velocityY += gravity;
 
-    // ground
-    if(player.y >= 180){
-        player.y = 180;
-        player.velocityY = 0;
-        player.grounded = true;
+    if (player.y >= 160) {
+        player.y = 160;
+        player.jumping = false;
     }
 
-    drawPlayer();
-
-    /* OBSTACLES */
-
-    for(let i = obstacles.length - 1; i >= 0; i--){
-
-        const ob = obstacles[i];
-
-        ob.x -= ob.speed;
-
-        drawObstacle(ob);
+    // obstacles
+    for (let i = 0; i < obstacles.length; i++) {
+        obstacles[i].x -= obstacles[i].speed;
 
         // collision
-        if(
-            player.x < ob.x + ob.width &&
-            player.x + player.width > ob.x &&
-            player.y < ob.y + ob.height &&
-            player.y + player.height > ob.y
-        ){
-            endGame();
-        }
-
-        // score
-        if(!ob.scored && ob.x + ob.width < player.x){
-            ob.scored = true;
-            score++;
-            scoreEl.innerText = "Score: " + score;
-        }
-
-        // remove
-        if(ob.x + ob.width < -50){
-            obstacles.splice(i,1);
+        if (
+            player.x < obstacles[i].x + obstacles[i].w &&
+            player.x + player.w > obstacles[i].x &&
+            player.y < obstacles[i].y + obstacles[i].h &&
+            player.y + player.h > obstacles[i].y
+        ) {
+            gameOver = true;
         }
     }
 
-    requestAnimationFrame(update);
+    obstacles = obstacles.filter(o => o.x > -50);
 }
 
-update();
+function drawGame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // ground
+    ctx.fillStyle = "#222";
+    ctx.fillRect(0, 180, canvas.width, 30);
 
-/* ===================================================
-   CONTROLS
-=================================================== */
+    // player (SpongeBob placeholder)
+    ctx.fillStyle = "yellow";
+    ctx.fillRect(player.x, player.y, player.w, player.h);
 
-function jump(){
+    // jellyfish
+    ctx.fillStyle = "cyan";
+    obstacles.forEach(o => {
+        ctx.fillRect(o.x, o.y, o.w, o.h);
+    });
 
-    if(player.grounded){
-        player.velocityY = player.jumpForce;
-        player.grounded = false;
+    if (gameOver) {
+        ctx.fillStyle = "white";
+        ctx.font = "20px Arial";
+        ctx.fillText("Game Over", 120, 100);
     }
 }
 
-// keyboard
-document.addEventListener("keydown", (e) => {
-
-    if(e.code === "Space" || e.code === "ArrowUp"){
-        jump();
-    }
-});
-
-// clickable keyboard buttons
-document.getElementById("jumpButton").addEventListener("click", jump);
-
-document.getElementById("leftButton").addEventListener("click", () => {
-    widget.style.transform += " rotate(-1deg)";
-});
-
-document.getElementById("rightButton").addEventListener("click", () => {
-    widget.style.transform += " rotate(1deg)";
-});
-
-
-/* ===================================================
-   GAME OVER
-=================================================== */
-
-function endGame(){
-    gameRunning = false;
-    gameOverEl.classList.add("show");
+function loop() {
+    updateGame();
+    drawGame();
+    requestAnimationFrame(loop);
 }
 
-restartBtn.addEventListener("click", () => {
-
-    obstacles = [];
-    score = 0;
-
-    scoreEl.innerText = "Score: 0";
-
-    player.y = 180;
-    player.velocityY = 0;
-
-    gameRunning = true;
-
-    gameOverEl.classList.remove("show");
-
-    update();
-});
-
+loop();
 </script>
 
 </body>
