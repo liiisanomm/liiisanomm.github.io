@@ -287,3 +287,333 @@
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Interactive Squidward Computer</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  overflow:hidden;
+  width:100vw;
+  height:100vh;
+  font-family:Arial, sans-serif;
+
+  background-image:url('https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+
+/* COMPUTER */
+#computer{
+  position:absolute;
+  width:620px;
+
+  left:50%;
+  top:50%;
+
+  transform:translate(-50%, -50%);
+  cursor:grab;
+  user-select:none;
+
+  animation:floaty 4s ease-in-out infinite;
+
+  z-index:10;
+}
+
+/* FLOATING */
+@keyframes floaty{
+  0%{
+    transform:translate(-50%, -50%) translateY(0px);
+  }
+  50%{
+    transform:translate(-50%, -50%) translateY(-10px);
+  }
+  100%{
+    transform:translate(-50%, -50%) translateY(0px);
+  }
+}
+
+#computer.dragging{
+  animation:none;
+  cursor:grabbing;
+}
+
+/* IMPORTANT:
+   THIS REMOVES WHITE BACKGROUND
+   FROM THE IMAGE AUTOMATICALLY
+*/
+#computer img{
+  width:100%;
+  display:block;
+
+  mix-blend-mode:multiply;
+
+  /* keeps screen visible */
+  filter:
+    contrast(1.12)
+    brightness(1.02);
+}
+
+/* INTERACTIVE AREAS */
+/* These are invisible clickable zones
+   placed EXACTLY over the REAL buttons
+   already inside your image.
+*/
+
+.hotspot{
+  position:absolute;
+  cursor:pointer;
+  z-index:30;
+  background:transparent;
+}
+
+/* POWER BUTTON */
+#powerZone{
+  width:38px;
+  height:38px;
+
+  left:98px;
+  top:332px;
+
+  border-radius:50%;
+}
+
+/* PLAY BUTTON */
+#playZone{
+  width:54px;
+  height:54px;
+
+  left:196px;
+  bottom:56px;
+
+  border-radius:12px;
+}
+
+/* JUMP BUTTON */
+#jumpZone{
+  width:68px;
+  height:68px;
+
+  left:272px;
+  bottom:48px;
+
+  border-radius:14px;
+}
+
+/* SCREEN EFFECTS */
+#screenOverlay{
+  position:absolute;
+
+  left:149px;
+  top:95px;
+
+  width:324px;
+  height:186px;
+
+  border-radius:10px;
+
+  pointer-events:none;
+
+  transition:0.35s;
+}
+
+/* SCREEN OFF */
+.screenOff{
+  background:rgba(0,0,0,0.95);
+}
+
+/* PLAY MODE */
+.playing{
+  filter:
+    drop-shadow(0 0 18px #59b7ff)
+    brightness(1.1);
+}
+
+/* CLICK FEEDBACK */
+.clicked{
+  transform:scale(0.92);
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="computer">
+
+  <!-- COMPUTER IMAGE -->
+  <img src="squidwardcomputer.png" alt="Computer">
+
+  <!-- SCREEN -->
+  <div id="screenOverlay"></div>
+
+  <!-- INVISIBLE INTERACTIVE ZONES -->
+  <div id="powerZone" class="hotspot"></div>
+  <div id="playZone" class="hotspot"></div>
+  <div id="jumpZone" class="hotspot"></div>
+
+</div>
+
+<script>
+
+const computer = document.getElementById('computer');
+
+const powerZone = document.getElementById('powerZone');
+const playZone = document.getElementById('playZone');
+const jumpZone = document.getElementById('jumpZone');
+
+const screenOverlay = document.getElementById('screenOverlay');
+
+let poweredOn = true;
+let playing = false;
+
+/* =========================
+   DRAGGING
+========================= */
+
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+computer.addEventListener('mousedown', (e)=>{
+
+  // don't drag when pressing hotspots
+  if(e.target.classList.contains('hotspot')) return;
+
+  isDragging = true;
+
+  const rect = computer.getBoundingClientRect();
+
+  offsetX = e.clientX - rect.left;
+  offsetY = e.clientY - rect.top;
+
+  computer.style.left = rect.left + 'px';
+  computer.style.top = rect.top + 'px';
+
+  computer.style.transform = 'none';
+
+  computer.classList.add('dragging');
+
+});
+
+document.addEventListener('mousemove', (e)=>{
+
+  if(!isDragging) return;
+
+  computer.style.left = (e.clientX - offsetX) + 'px';
+  computer.style.top = (e.clientY - offsetY) + 'px';
+
+});
+
+document.addEventListener('mouseup', ()=>{
+
+  isDragging = false;
+
+});
+
+/* =========================
+   POWER BUTTON
+========================= */
+
+powerZone.addEventListener('click', ()=>{
+
+  poweredOn = !poweredOn;
+
+  if(poweredOn){
+
+    screenOverlay.classList.remove('screenOff');
+
+  }else{
+
+    screenOverlay.classList.add('screenOff');
+
+    playing = false;
+    computer.classList.remove('playing');
+
+  }
+
+  clickAnim(powerZone);
+
+});
+
+/* =========================
+   PLAY BUTTON
+========================= */
+
+playZone.addEventListener('click', ()=>{
+
+  if(!poweredOn) return;
+
+  playing = !playing;
+
+  if(playing){
+
+    computer.classList.add('playing');
+
+  }else{
+
+    computer.classList.remove('playing');
+
+  }
+
+  clickAnim(playZone);
+
+});
+
+/* =========================
+   JUMP BUTTON
+========================= */
+
+jumpZone.addEventListener('click', ()=>{
+
+  if(!poweredOn) return;
+
+  clickAnim(jumpZone);
+
+  computer.animate([
+    {
+      transform:'translateY(0px)'
+    },
+    {
+      transform:'translateY(-120px)'
+    },
+    {
+      transform:'translateY(0px)'
+    }
+  ],{
+    duration:600,
+    easing:'cubic-bezier(.17,.67,.3,1.46)'
+  });
+
+});
+
+/* =========================
+   CLICK EFFECT
+========================= */
+
+function clickAnim(el){
+
+  el.classList.add('clicked');
+
+  setTimeout(()=>{
+    el.classList.remove('clicked');
+  },120);
+
+}
+
+</script>
+
+</body>
+</html>
