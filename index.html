@@ -459,3 +459,294 @@ jumpZone.addEventListener('click', ()=>{
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Squidward Computer</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  overflow:hidden;
+  width:100vw;
+  height:100vh;
+
+  background-image:url('https://i.pinimg.com/736x/92/12/80/9212808f9c52e40fa95b53b04b1e54a7.jpg');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+
+#computer{
+  position:absolute;
+
+  width:620px;
+
+  left:50%;
+  top:50%;
+
+  transform:translate(-50%, -50%);
+
+  cursor:grab;
+  user-select:none;
+
+  transition:
+    left 0.05s linear,
+    top 0.05s linear;
+}
+
+#computer.dragging{
+  cursor:grabbing;
+}
+
+#computer img{
+  width:100%;
+  display:block;
+  pointer-events:none;
+}
+
+/* SCREEN */
+
+#screen{
+  position:absolute;
+
+  left:148px;
+  top:94px;
+
+  width:325px;
+  height:187px;
+
+  background:white;
+
+  opacity:0;
+
+  transition:opacity 0.2s ease;
+
+  border-radius:6px;
+
+  pointer-events:none;
+}
+
+/* INVISIBLE HOTSPOTS */
+
+.hotspot{
+  position:absolute;
+  background:transparent;
+  cursor:pointer;
+}
+
+/* POWER BUTTON */
+
+#powerZone{
+  width:30px;
+  height:30px;
+
+  left:90px;
+  top:327px;
+
+  border-radius:50%;
+}
+
+/* PLAY BUTTON */
+
+#playZone{
+  width:50px;
+  height:50px;
+
+  left:195px;
+  bottom:55px;
+}
+
+/* JUMP BUTTON */
+
+#jumpZone{
+  width:65px;
+  height:65px;
+
+  left:270px;
+  bottom:47px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="computer">
+
+  <div id="screen"></div>
+
+  <img src="squidwardcomputer3.png" alt="Computer">
+
+  <!-- EXISTING BUTTONS -->
+  <div id="powerZone" class="hotspot"></div>
+  <div id="playZone" class="hotspot"></div>
+  <div id="jumpZone" class="hotspot"></div>
+
+</div>
+
+<script>
+
+const computer = document.getElementById('computer');
+
+const screen = document.getElementById('screen');
+
+const powerZone = document.getElementById('powerZone');
+const playZone = document.getElementById('playZone');
+const jumpZone = document.getElementById('jumpZone');
+
+let poweredOn = false;
+
+/* =========================
+   SMOOTH DRAGGING
+========================= */
+
+let isDragging = false;
+
+let currentX = window.innerWidth / 2;
+let currentY = window.innerHeight / 2;
+
+let targetX = currentX;
+let targetY = currentY;
+
+let offsetX = 0;
+let offsetY = 0;
+
+computer.style.left = currentX + 'px';
+computer.style.top = currentY + 'px';
+
+computer.style.transform = 'translate(-50%, -50%)';
+
+computer.addEventListener('mousedown', (e)=>{
+
+  if(e.target.classList.contains('hotspot')) return;
+
+  isDragging = true;
+
+  computer.classList.add('dragging');
+
+  const rect = computer.getBoundingClientRect();
+
+  offsetX = e.clientX - rect.left;
+  offsetY = e.clientY - rect.top;
+
+});
+
+document.addEventListener('mousemove', (e)=>{
+
+  if(!isDragging) return;
+
+  targetX = e.clientX - offsetX + (computer.offsetWidth / 2);
+  targetY = e.clientY - offsetY + (computer.offsetHeight / 2);
+
+});
+
+document.addEventListener('mouseup', ()=>{
+
+  isDragging = false;
+
+  computer.classList.remove('dragging');
+
+});
+
+/* smooth movement */
+
+function animate(){
+
+  currentX += (targetX - currentX) * 0.12;
+  currentY += (targetY - currentY) * 0.12;
+
+  computer.style.left = currentX + 'px';
+  computer.style.top = currentY + 'px';
+
+  requestAnimationFrame(animate);
+
+}
+
+animate();
+
+/* =========================
+   BUTTON MOVEMENT
+========================= */
+
+function pressButton(button){
+
+  button.animate([
+    { transform:'translateY(0px)' },
+    { transform:'translateY(4px)' },
+    { transform:'translateY(0px)' }
+  ],{
+    duration:140,
+    easing:'ease-out'
+  });
+
+}
+
+/* =========================
+   POWER BUTTON
+========================= */
+
+powerZone.addEventListener('click', ()=>{
+
+  pressButton(powerZone);
+
+  poweredOn = !poweredOn;
+
+  if(poweredOn){
+
+    screen.style.opacity = '1';
+
+  }else{
+
+    screen.style.opacity = '0';
+
+  }
+
+});
+
+/* =========================
+   PLAY BUTTON
+========================= */
+
+playZone.addEventListener('click', ()=>{
+
+  if(!poweredOn) return;
+
+  pressButton(playZone);
+
+});
+
+/* =========================
+   JUMP BUTTON
+========================= */
+
+jumpZone.addEventListener('click', ()=>{
+
+  if(!poweredOn) return;
+
+  pressButton(jumpZone);
+
+  computer.animate([
+    { transform:'translate(-50%, -50%) translateY(0px)' },
+    { transform:'translate(-50%, -50%) translateY(-120px)' },
+    { transform:'translate(-50%, -50%) translateY(0px)' }
+  ],{
+    duration:600,
+    easing:'ease-out'
+  });
+
+});
+
+</script>
+
+</body>
+</html>
