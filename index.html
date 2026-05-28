@@ -632,6 +632,20 @@ function gameLoop() {
 }
 
 // ============================================================
+// AUDIO
+// The file must be committed to your GitHub repo.
+// Rename the constant below to match your exact filename.
+// ============================================================
+const GITHUB_RAW = 'https://raw.githubusercontent.com/liiisanomm/liiisanomm.github.io/main/Spongebob SquarePants Theme song (NEW HD) Episode Opening  Credits Nick Animation';
+
+const bgm = new Audio(GITHUB_RAW);
+bgm.loop = true;
+bgm.volume = 0.7;
+
+function playMusic() { bgm.currentTime = 0; bgm.play().catch(() => {}); }
+function stopMusic() { bgm.pause(); bgm.currentTime = 0; }
+
+// ============================================================
 // CONTROLS
 // ============================================================
 let screenOn = false;
@@ -641,12 +655,14 @@ function turnOn() {
   gameState = 'idle';
   initGame();
   if (rafId) cancelAnimationFrame(rafId);
+  playMusic();
   gameLoop();
 }
 
 function turnOff() {
   screenOn = false;
   gameState = 'off';
+  stopMusic();
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   ctx.save();
   ctx.clip(SCREEN_PATH_LOCAL);
